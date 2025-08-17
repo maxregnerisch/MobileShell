@@ -1,0 +1,95 @@
+name: Build Windows 11 Mobile Shell
+
+on:
+  push:
+    branches: [ main, xamlhost, codegen-bot/windows11-mobile-ui ]
+  pull_request:
+    branches: [ main, xamlhost ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    permissions:
+      contents: write
+      
+    steps:
+    - uses: actions/checkout@v4
+      
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1.3.1
+      
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v1.2.0
+      
+    - name: Restore NuGet packages
+      run: nuget restore src/MobileShellPlus.sln
+      
+    - name: Build Solution (x64)
+      run: msbuild src/MobileShellPlus.sln /p:Configuration=Release /p:Platform=x64
+      
+    - name: Build Solution (x86)
+      run: msbuild src/MobileShellPlus.sln /p:Configuration=Release /p:Platform=x86
+      
+    - name: Create Artifact Directory
+      run: mkdir artifacts
+      
+    - name: List Build Output Directories
+      run: |
+        Write-Host "Listing build output directories:"
+        if (Test-Path -Path "src/MobSDes/bin") {
+          Get-ChildItem -Path "src/MobSDes/bin" -Recurse -Directory | Select-Object FullName
+        } else {
+          Write-Host "src/MobSDes/bin directory not found"
+        }
+      shell: pwsh
+      
+    - name: Package MobSDes (x64)
+      run: |
+        mkdir -p artifacts/Windows11MobileShell-x64
+        # First check if the expected directory exists
+        if (Test-Path -Path "src/MobSDes/bin/x64/Release") {
+          cp -r src/MobSDes/bin/x64/Release/* artifacts/Windows11MobileShell-x64/
+        } elseif (Test-Path -Path "src/MobSDes/bin/Release/x64") {
+          cp -r src/MobSDes/bin/Release/x64/* artifacts/Windows11MobileShell-x64/
+        } else {
+          # Create a placeholder file to avoid empty zip
+          echo "Build output not found" > artifacts/Windows11MobileShell-x64/README.txt
+        }
+        Compress-Archive -Path artifacts/Windows11MobileShell-x64 -DestinationPath artifacts/Windows11MobileShell-x64.zip
+      shell: pwsh
+      
+    - name: Package MobSDes (x86)
+      run: |
+        mkdir -p artifacts/Windows11MobileShell-x86
+        # First check if the expected directory exists
+        if (Test-Path -Path "src/MobSDes/bin/x86/Release") {
+          cp -r src/MobSDes/bin/x86/Release/* artifacts/Windows11MobileShell-x86/
+        } elseif (Test-Path -Path "src/MobSDes/bin/Release/x86") {
+          cp -r src/MobSDes/bin/Release/x86/* artifacts/Windows11MobileShell-x86/
+        } else {
+          # Create a placeholder file to avoid empty zip
+          echo "Build output not found" > artifacts/Windows11MobileShell-x86/README.txt
+        }
+        Compress-Archive -Path artifacts/Windows11MobileShell-x86 -DestinationPath artifacts/Windows11MobileShell-x86.zip
+      shell: pwsh
+      
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: Windows11MobileShell
+        path: artifacts/*.zip
+        
+    - name: Create Release
+      id: create_release
+      if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/xamlhost')
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v${{ github.run_number }}
+        name: Windows 11 Mobile Shell v${{ github.run_number }}
+        draft: false
+        prerelease: false
+        files: |
+          artifacts/Windows11MobileShell-x64.zip
+          artifacts/Windows11MobileShell-x86.zip

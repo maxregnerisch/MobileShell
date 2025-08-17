@@ -3,5 +3,52 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:MobSDes">
-
+    
+    <Application.Resources>
+        <ResourceDictionary>
+            <!-- Windows 11 Mobile Theme Colors -->
+            <Color x:Key="Win11MobileAccentColor">#FF0078D7</Color>
+            <Color x:Key="Win11MobileBackgroundColor">#FF000000</Color>
+            <Color x:Key="Win11MobileTextColor">#FFFFFFFF</Color>
+            
+            <!-- Brushes -->
+            <SolidColorBrush x:Key="Win11MobileAccentBrush" Color="{StaticResource Win11MobileAccentColor}"/>
+            <SolidColorBrush x:Key="Win11MobileBackgroundBrush" Color="{StaticResource Win11MobileBackgroundColor}"/>
+            <SolidColorBrush x:Key="Win11MobileTextBrush" Color="{StaticResource Win11MobileTextColor}"/>
+            
+            <!-- Button Style -->
+            <Style x:Key="Win11MobileButtonStyle" TargetType="Button">
+                <Setter Property="Background" Value="{StaticResource Win11MobileAccentBrush}"/>
+                <Setter Property="Foreground" Value="{StaticResource Win11MobileTextBrush}"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Padding" Value="12,6"/>
+                <Setter Property="CornerRadius" Value="4"/>
+            </Style>
+            
+            <!-- TextBlock Style -->
+            <Style x:Key="Win11MobileTextBlockStyle" TargetType="TextBlock">
+                <Setter Property="Foreground" Value="{StaticResource Win11MobileTextBrush}"/>
+                <Setter Property="FontFamily" Value="Segoe UI"/>
+            </Style>
+            
+            <!-- CommandBar Style -->
+            <Style x:Key="Win11MobileCommandBarStyle" TargetType="CommandBar">
+                <Setter Property="Background" Value="{StaticResource Win11MobileAccentBrush}"/>
+                <Setter Property="Foreground" Value="{StaticResource Win11MobileTextBrush}"/>
+                <Setter Property="DefaultLabelPosition" Value="Right"/>
+            </Style>
+            
+            <!-- AppBarButton Style -->
+            <Style x:Key="Win11MobileAppBarButtonStyle" TargetType="AppBarButton">
+                <Setter Property="Foreground" Value="{StaticResource Win11MobileTextBrush}"/>
+            </Style>
+            
+            <!-- Tile Style -->
+            <Style x:Key="Win11MobileTileStyle" TargetType="Grid">
+                <Setter Property="Margin" Value="6"/>
+                <Setter Property="Width" Value="150"/>
+                <Setter Property="Height" Value="150"/>
+            </Style>
+        </ResourceDictionary>
+    </Application.Resources>
 </Application>
