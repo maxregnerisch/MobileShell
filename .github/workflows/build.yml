@@ -47,7 +47,7 @@ jobs:
       shell: pwsh
       
     - name: Upload Artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: Windows11MobileShell
         path: artifacts/*.zip
