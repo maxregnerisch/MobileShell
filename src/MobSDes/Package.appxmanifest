@@ -14,7 +14,7 @@
   <mp:PhoneIdentity PhoneProductId="6d91848a-9d7b-4f99-8734-9510c98db34d" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>MobSDes</DisplayName>
+    <DisplayName>Windows 11 Mobile Shell</DisplayName>
     <PublisherDisplayName>ADelt</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
@@ -32,10 +32,10 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="MobSDes.App">
       <uap:VisualElements
-        DisplayName="MobSDes"
+        DisplayName="Windows 11 Mobile Shell"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png"
-        Description="MobSDes"
+        Description="A Windows 11 Mobile-like shell experience for Windows 10/11 Desktop"
         BackgroundColor="transparent">
         <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png"/>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />

@@ -1,0 +1,87 @@
+name: Build Windows 11 Mobile Shell
+
+on:
+  push:
+    branches: [ main, xamlhost, codegen-bot/windows11-mobile-ui ]
+  pull_request:
+    branches: [ main, xamlhost ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+      
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1.0.2
+      
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v1.0.5
+      
+    - name: Restore NuGet packages
+      run: nuget restore src/MobileShellPlus.sln
+      
+    - name: Build Solution (x64)
+      run: msbuild src/MobileShellPlus.sln /p:Configuration=Release /p:Platform=x64
+      
+    - name: Build Solution (x86)
+      run: msbuild src/MobileShellPlus.sln /p:Configuration=Release /p:Platform=x86
+      
+    - name: Create Artifact Directory
+      run: mkdir artifacts
+      
+    - name: Package MobSDes (x64)
+      run: |
+        mkdir -p artifacts/Windows11MobileShell-x64
+        cp -r src/MobSDes/bin/x64/Release/* artifacts/Windows11MobileShell-x64/
+        Compress-Archive -Path artifacts/Windows11MobileShell-x64 -DestinationPath artifacts/Windows11MobileShell-x64.zip
+      shell: pwsh
+      
+    - name: Package MobSDes (x86)
+      run: |
+        mkdir -p artifacts/Windows11MobileShell-x86
+        cp -r src/MobSDes/bin/x86/Release/* artifacts/Windows11MobileShell-x86/
+        Compress-Archive -Path artifacts/Windows11MobileShell-x86 -DestinationPath artifacts/Windows11MobileShell-x86.zip
+      shell: pwsh
+      
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: Windows11MobileShell
+        path: artifacts/*.zip
+        
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/xamlhost')
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ github.run_number }}
+        release_name: Windows 11 Mobile Shell v${{ github.run_number }}
+        draft: false
+        prerelease: false
+        
+    - name: Upload Release Assets (x64)
+      uses: actions/upload-release-asset@v1
+      if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/xamlhost')
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: artifacts/Windows11MobileShell-x64.zip
+        asset_name: Windows11MobileShell-x64.zip
+        asset_content_type: application/zip
+        
+    - name: Upload Release Assets (x86)
+      uses: actions/upload-release-asset@v1
+      if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/xamlhost')
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: artifacts/Windows11MobileShell-x86.zip
+        asset_name: Windows11MobileShell-x86.zip
+        asset_content_type: application/zip
