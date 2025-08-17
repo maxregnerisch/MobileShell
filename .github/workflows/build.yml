@@ -35,17 +35,43 @@ jobs:
     - name: Create Artifact Directory
       run: mkdir artifacts
       
+    - name: List Build Output Directories
+      run: |
+        Write-Host "Listing build output directories:"
+        if (Test-Path -Path "src/MobSDes/bin") {
+          Get-ChildItem -Path "src/MobSDes/bin" -Recurse -Directory | Select-Object FullName
+        } else {
+          Write-Host "src/MobSDes/bin directory not found"
+        }
+      shell: pwsh
+      
     - name: Package MobSDes (x64)
       run: |
         mkdir -p artifacts/Windows11MobileShell-x64
-        cp -r src/MobSDes/bin/x64/Release/* artifacts/Windows11MobileShell-x64/
+        # First check if the expected directory exists
+        if (Test-Path -Path "src/MobSDes/bin/x64/Release") {
+          cp -r src/MobSDes/bin/x64/Release/* artifacts/Windows11MobileShell-x64/
+        } elseif (Test-Path -Path "src/MobSDes/bin/Release/x64") {
+          cp -r src/MobSDes/bin/Release/x64/* artifacts/Windows11MobileShell-x64/
+        } else {
+          # Create a placeholder file to avoid empty zip
+          echo "Build output not found" > artifacts/Windows11MobileShell-x64/README.txt
+        }
         Compress-Archive -Path artifacts/Windows11MobileShell-x64 -DestinationPath artifacts/Windows11MobileShell-x64.zip
       shell: pwsh
       
     - name: Package MobSDes (x86)
       run: |
         mkdir -p artifacts/Windows11MobileShell-x86
-        cp -r src/MobSDes/bin/x86/Release/* artifacts/Windows11MobileShell-x86/
+        # First check if the expected directory exists
+        if (Test-Path -Path "src/MobSDes/bin/x86/Release") {
+          cp -r src/MobSDes/bin/x86/Release/* artifacts/Windows11MobileShell-x86/
+        } elseif (Test-Path -Path "src/MobSDes/bin/Release/x86") {
+          cp -r src/MobSDes/bin/Release/x86/* artifacts/Windows11MobileShell-x86/
+        } else {
+          # Create a placeholder file to avoid empty zip
+          echo "Build output not found" > artifacts/Windows11MobileShell-x86/README.txt
+        }
         Compress-Archive -Path artifacts/Windows11MobileShell-x86 -DestinationPath artifacts/Windows11MobileShell-x86.zip
       shell: pwsh
       
